@@ -1,0 +1,23 @@
+{
+  "Resources": {
+    "NoComponents": true,
+    "CoreServicesDlls": [
+      "./Decisions.Shopify/obj/Decisions.Shopify.dll"
+    ],
+    "ReferenceDlls": [
+      "./Decisions.Shopify/obj/ShopifySharp.dll",
+      "./Decisions.Shopify/obj/JetBrains.Annotations.dll"
+    ],
+    "CliDlls": null,
+    "WebPages": null,
+    "SilverlightDlls": null,
+    "AgentDlls": null,
+    "InstallScript": null,
+    "SqlScripts": null,
+    "ObjectsToImport": null,
+    "MsSqlScript": null
+  },
+  "Version": "9.0.0",
+  "ImagePath": "./image.png",
+  "Description": "Shopify integration module for products, inventory, orders, and customers."
+}
