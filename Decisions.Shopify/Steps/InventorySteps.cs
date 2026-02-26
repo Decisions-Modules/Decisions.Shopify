@@ -34,6 +34,19 @@ public class InventorySteps
           inventoryItem {
             id
           }
+          inventoryLevels(first: 50) {
+            edges {
+              node {
+                available
+                item {
+                  id
+                }
+                location {
+                  id
+                }
+              }
+            }
+          }
         }
       }
     }
@@ -94,6 +107,82 @@ public class InventorySteps
             },
             UserErrors = ShopifyMapper.ToUserErrors(result?.InventoryAdjustQuantities?.UserErrors)
         };
+    }
+
+    public ShopifyLocation[] ListLocations([PropertyClassification(0, "Store Domain", "Connection")] string storeDomain,
+      [TokenPicker][PropertyClassification(0, "Token", "Connection")] string tokenId,
+      int first = 50,
+      string? after = null)
+    {
+        int pageSize = first;
+        if (pageSize <= 0)
+            pageSize = 50;
+
+        ShopifyGraphQlClient client = CreateClient(storeDomain, tokenId);
+
+        const string query = @"query ($first: Int!, $after: String) {
+  locations(first: $first, after: $after) {
+    edges {
+      node {
+        id
+        name
+        isActive
+      }
+    }
+  }
+}";
+
+        GraphLocationsResult? result = client.ExecuteAsync<GraphLocationsResult>(query, new Dictionary<string, object>
+        {
+            ["first"] = pageSize,
+            ["after"] = string.IsNullOrWhiteSpace(after) ? null! : after
+        }).GetAwaiter().GetResult();
+
+        return result?.Locations?.Edges?
+            .Where(edge => edge.Node != null)
+            .Select(edge => ShopifyMapper.ToLocation(edge.Node!))
+            .ToArray() ?? Array.Empty<ShopifyLocation>();
+    }
+
+    public ShopifyInventoryLevel[] ListInventoryLevelsByInventoryItemId([PropertyClassification(0, "Store Domain", "Connection")] string storeDomain,
+      [TokenPicker][PropertyClassification(0, "Token", "Connection")] string tokenId,
+      string inventoryItemId,
+      int first = 50)
+    {
+        int pageSize = first;
+        if (pageSize <= 0)
+            pageSize = 50;
+
+        ShopifyGraphQlClient client = CreateClient(storeDomain, tokenId);
+
+        const string query = @"query ($id: ID!, $first: Int!) {
+  inventoryItem(id: $id) {
+    inventoryLevels(first: $first) {
+      edges {
+        node {
+          available
+          item {
+            id
+          }
+          location {
+            id
+          }
+        }
+      }
+    }
+  }
+}";
+
+        GraphInventoryLevelsForItemResult? result = client.ExecuteAsync<GraphInventoryLevelsForItemResult>(query, new Dictionary<string, object>
+        {
+            ["id"] = inventoryItemId,
+            ["first"] = pageSize
+        }).GetAwaiter().GetResult();
+
+        return result?.InventoryItem?.InventoryLevels?.Edges?
+            .Where(edge => edge.Node != null)
+            .Select(edge => ShopifyMapper.ToInventoryLevel(edge.Node!))
+            .ToArray() ?? Array.Empty<ShopifyInventoryLevel>();
     }
 
     private static ShopifyGraphQlClient CreateClient(string storeDomain, string tokenId)

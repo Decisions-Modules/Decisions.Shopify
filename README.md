@@ -83,13 +83,24 @@ How to use:
 
 #### List Variants By Product Id
 Intention:
-- Return typed variant data for a product, including inventory item references.
+- Return typed variant data for a product, including inventory item references and per-location inventory levels.
 
 How to use:
 1. Provide `Store Domain` and `Token`.
 2. Provide `productId`.
 3. Set `first` to control returned count.
 4. Use `InventoryItemId` from each variant for inventory adjustments.
+5. Use `InventoryLevels[].LocationId` when you need a valid location for adjustment.
+
+#### List Locations
+Intention:
+- Retrieve Shopify locations to drive location selection in inventory flows.
+
+How to use:
+1. Provide `Store Domain` and `Token`.
+2. Set `first` page size; optional `after` cursor for next page.
+3. Use returned `Id` as `locationId` for inventory adjustment.
+4. Use `Name` and `IsActive` for UI filtering or operator choice.
 
 #### Adjust Inventory Available
 Intention:
@@ -156,7 +167,7 @@ This example shows a common inventory workflow:
 ### Prerequisites
 - You have store domain and a Decisions OAuth token to select on each step.
 - Token has product and inventory scopes.
-- You know the Shopify location ID to adjust.
+- You can get location IDs from `List Variants By Product Id` (`InventoryLevels`) or `List Locations`.
 
 ### Flow Outline
 
@@ -169,12 +180,18 @@ This example shows a common inventory workflow:
 - Use `Integration/Shopify/Inventory -> List Variants By Product Id`.
 - Pass selected product `Id` and set `first` (for example `50`).
 - Select target variant and capture `InventoryItemId`.
+- Choose a `LocationId` from the variant `InventoryLevels`.
+
+#### Optional Step: List Locations
+- Use `Integration/Shopify/Inventory -> List Locations`.
+- Use this when you want a store-wide list of locations instead of variant-scoped locations.
+- Pick target location `Id` for the adjustment step.
 
 #### Step 3: Adjust Inventory Available
 - Use `Integration/Shopify/Inventory -> Adjust Inventory Available`.
 - Inputs:
 	- `inventoryItemId`: from selected variant
-	- `locationId`: target Shopify location
+	- `locationId`: from `InventoryLevels` or `List Locations`
 	- `delta`: integer quantity change (positive adds, negative removes)
 - Check `UserErrors`; if not empty, route to error handling path.
 

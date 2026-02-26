@@ -88,7 +88,7 @@ public class ProductsSteps
       [TokenPicker][PropertyClassification(0, "Token", "Connection")] string tokenId,
       ShopifyProductInput product)
     {
-        if (string.IsNullOrWhiteSpace(product.Title))
+        if (string.IsNullOrWhiteSpace(product?.Title))
             throw new BusinessRuleException("Product title is required.");
 
         ShopifyGraphQlClient client = CreateClient(storeDomain, tokenId);
@@ -112,11 +112,11 @@ public class ProductsSteps
 
         Dictionary<string, object?> productInput = new()
         {
-            ["title"] = product.Title,
-            ["handle"] = product.Handle,
-            ["status"] = product.Status,
-            ["vendor"] = product.Vendor,
-            ["productType"] = product.ProductType
+          ["title"] = product.Title,
+          ["handle"] = string.IsNullOrWhiteSpace(product.Handle) ? null : product.Handle,
+          ["status"] = string.IsNullOrWhiteSpace(product.Status) ? null : product.Status,
+          ["vendor"] = string.IsNullOrWhiteSpace(product.Vendor) ? null : product.Vendor,
+          ["productType"] = string.IsNullOrWhiteSpace(product.ProductType) ? null : product.ProductType
         };
 
         GraphProductCreateResult? result = client.ExecuteAsync<GraphProductCreateResult>(mutation, new Dictionary<string, object>
@@ -136,6 +136,9 @@ public class ProductsSteps
       string productId,
       ShopifyProductInput product)
     {
+        if (product == null)
+            throw new BusinessRuleException("Product input is required.");
+
         ShopifyGraphQlClient client = CreateClient(storeDomain, tokenId);
 
         const string mutation = @"mutation ($product: ProductUpdateInput!) {
@@ -158,11 +161,11 @@ public class ProductsSteps
         Dictionary<string, object?> productInput = new()
         {
             ["id"] = productId,
-            ["title"] = product.Title,
-            ["handle"] = product.Handle,
-            ["status"] = product.Status,
-            ["vendor"] = product.Vendor,
-            ["productType"] = product.ProductType
+          ["title"] = string.IsNullOrWhiteSpace(product.Title) ? null : product.Title,
+          ["handle"] = string.IsNullOrWhiteSpace(product.Handle) ? null : product.Handle,
+          ["status"] = string.IsNullOrWhiteSpace(product.Status) ? null : product.Status,
+          ["vendor"] = string.IsNullOrWhiteSpace(product.Vendor) ? null : product.Vendor,
+          ["productType"] = string.IsNullOrWhiteSpace(product.ProductType) ? null : product.ProductType
         };
 
         GraphProductUpdateResult? result = client.ExecuteAsync<GraphProductUpdateResult>(mutation, new Dictionary<string, object>

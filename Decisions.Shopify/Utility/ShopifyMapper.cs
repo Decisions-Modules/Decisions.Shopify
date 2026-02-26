@@ -19,6 +19,11 @@ internal static class ShopifyMapper
 
     public static ShopifyVariant ToVariant(GraphVariantNode node, string productId)
     {
+        ShopifyInventoryLevel[] inventoryLevels = node.InventoryLevels?.Edges?
+            .Where(edge => edge.Node != null)
+            .Select(edge => ToInventoryLevel(edge.Node!))
+            .ToArray() ?? Array.Empty<ShopifyInventoryLevel>();
+
         return new ShopifyVariant
         {
             Id = node.Id ?? string.Empty,
@@ -27,7 +32,8 @@ internal static class ShopifyMapper
             Sku = node.Sku ?? string.Empty,
             Price = node.Price ?? string.Empty,
             InventoryQuantity = node.InventoryQuantity,
-            InventoryItemId = node.InventoryItem?.Id ?? string.Empty
+            InventoryItemId = node.InventoryItem?.Id ?? string.Empty,
+            InventoryLevels = inventoryLevels
         };
     }
 
@@ -38,6 +44,16 @@ internal static class ShopifyMapper
             Available = node.Available,
             InventoryItemId = node.Item?.Id ?? string.Empty,
             LocationId = node.Location?.Id ?? string.Empty
+        };
+    }
+
+    public static ShopifyLocation ToLocation(GraphLocationNode node)
+    {
+        return new ShopifyLocation
+        {
+            Id = node.Id ?? string.Empty,
+            Name = node.Name ?? string.Empty,
+            IsActive = node.IsActive
         };
     }
 
@@ -58,6 +74,10 @@ internal static class ShopifyMapper
 
     public static ShopifyCustomer ToCustomer(GraphCustomerNode node)
     {
+        string tags = node.Tags == null
+            ? string.Empty
+            : string.Join(", ", node.Tags.Where(tag => !string.IsNullOrWhiteSpace(tag)));
+
         return new ShopifyCustomer
         {
             Id = node.Id ?? string.Empty,
@@ -65,7 +85,7 @@ internal static class ShopifyMapper
             FirstName = node.FirstName ?? string.Empty,
             LastName = node.LastName ?? string.Empty,
             Phone = node.Phone ?? string.Empty,
-            Tags = node.Tags ?? string.Empty
+            Tags = tags
         };
     }
 

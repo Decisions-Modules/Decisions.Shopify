@@ -1,3 +1,6 @@
+using System.Text.Json;
+using System.Text.Json.Serialization;
+
 namespace Decisions.Shopify.Data;
 
 internal class GraphPageInfo
@@ -35,6 +38,7 @@ internal class GraphVariantNode
     public string? Price { get; set; }
     public int? InventoryQuantity { get; set; }
     public GraphInventoryItem? InventoryItem { get; set; }
+    public GraphConnection<GraphInventoryLevelNode>? InventoryLevels { get; set; }
 }
 
 internal class GraphInventoryItem
@@ -52,6 +56,8 @@ internal class GraphInventoryLevelNode
 internal class GraphLocationNode
 {
     public string? Id { get; set; }
+    public string? Name { get; set; }
+    public bool? IsActive { get; set; }
 }
 
 internal class GraphOrderNode
@@ -83,7 +89,56 @@ internal class GraphCustomerNode
     public string? FirstName { get; set; }
     public string? LastName { get; set; }
     public string? Phone { get; set; }
-    public string? Tags { get; set; }
+    [JsonConverter(typeof(StringOrStringArrayConverter))]
+    public string[]? Tags { get; set; }
+}
+
+internal sealed class StringOrStringArrayConverter : JsonConverter<string[]?>
+{
+    public override string[]? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+    {
+        if (reader.TokenType == JsonTokenType.Null)
+            return null;
+
+        if (reader.TokenType == JsonTokenType.String)
+        {
+            string? value = reader.GetString();
+            return string.IsNullOrWhiteSpace(value) ? Array.Empty<string>() : new[] { value };
+        }
+
+        if (reader.TokenType != JsonTokenType.StartArray)
+            throw new JsonException($"Unexpected token {reader.TokenType} for tags.");
+
+        List<string> tags = new();
+        while (reader.Read())
+        {
+            if (reader.TokenType == JsonTokenType.EndArray)
+                return tags.ToArray();
+
+            if (reader.TokenType == JsonTokenType.String)
+            {
+                string? tag = reader.GetString();
+                if (!string.IsNullOrWhiteSpace(tag))
+                    tags.Add(tag);
+            }
+        }
+
+        throw new JsonException("Incomplete JSON array for tags.");
+    }
+
+    public override void Write(Utf8JsonWriter writer, string[]? value, JsonSerializerOptions options)
+    {
+        if (value == null)
+        {
+            writer.WriteNullValue();
+            return;
+        }
+
+        writer.WriteStartArray();
+        foreach (string tag in value)
+            writer.WriteStringValue(tag);
+        writer.WriteEndArray();
+    }
 }
 
 internal class GraphUserError
@@ -105,6 +160,21 @@ internal class GraphProductResult
 internal class GraphVariantsForProductResult
 {
     public GraphProductVariantsNode? Product { get; set; }
+}
+
+internal class GraphLocationsResult
+{
+    public GraphConnection<GraphLocationNode>? Locations { get; set; }
+}
+
+internal class GraphInventoryLevelsForItemResult
+{
+    public GraphInventoryItemLevelsNode? InventoryItem { get; set; }
+}
+
+internal class GraphInventoryItemLevelsNode
+{
+    public GraphConnection<GraphInventoryLevelNode>? InventoryLevels { get; set; }
 }
 
 internal class GraphProductVariantsNode
