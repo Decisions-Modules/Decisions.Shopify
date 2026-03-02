@@ -19,7 +19,7 @@ internal static class ShopifyMapper
 
     public static ShopifyVariant ToVariant(GraphVariantNode node, string productId)
     {
-        ShopifyInventoryLevel[] inventoryLevels = node.InventoryLevels?.Edges?
+        ShopifyInventoryLevel[] inventoryLevels = node.InventoryItem?.InventoryLevels?.Edges?
             .Where(edge => edge.Node != null)
             .Select(edge => ToInventoryLevel(edge.Node!))
             .ToArray() ?? Array.Empty<ShopifyInventoryLevel>();
@@ -39,9 +39,13 @@ internal static class ShopifyMapper
 
     public static ShopifyInventoryLevel ToInventoryLevel(GraphInventoryLevelNode node)
     {
+        int? available = node.Quantities?
+            .FirstOrDefault(quantity => string.Equals(quantity.Name, "available", StringComparison.OrdinalIgnoreCase))?
+            .Quantity ?? node.Quantities?.FirstOrDefault()?.Quantity;
+
         return new ShopifyInventoryLevel
         {
-            Available = node.Available,
+            Available = available,
             InventoryItemId = node.Item?.Id ?? string.Empty,
             LocationId = node.Location?.Id ?? string.Empty
         };
@@ -74,6 +78,9 @@ internal static class ShopifyMapper
 
     public static ShopifyCustomer ToCustomer(GraphCustomerNode node)
     {
+        string email = node.DefaultEmailAddress?.EmailAddress ?? node.Email ?? string.Empty;
+        string phone = node.DefaultPhoneNumber?.PhoneNumber ?? node.Phone ?? string.Empty;
+
         string tags = node.Tags == null
             ? string.Empty
             : string.Join(", ", node.Tags.Where(tag => !string.IsNullOrWhiteSpace(tag)));
@@ -81,10 +88,10 @@ internal static class ShopifyMapper
         return new ShopifyCustomer
         {
             Id = node.Id ?? string.Empty,
-            Email = node.Email ?? string.Empty,
+            Email = email,
             FirstName = node.FirstName ?? string.Empty,
             LastName = node.LastName ?? string.Empty,
-            Phone = node.Phone ?? string.Empty,
+            Phone = phone,
             Tags = tags
         };
     }

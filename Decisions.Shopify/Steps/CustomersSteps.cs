@@ -19,10 +19,14 @@ public class CustomersSteps
         const string query = @"query ($id: ID!) {
   customer(id: $id) {
     id
-    email
+            defaultEmailAddress {
+              emailAddress
+            }
     firstName
     lastName
-    phone
+            defaultPhoneNumber {
+              phoneNumber
+            }
     tags
   }
 }";
@@ -55,10 +59,14 @@ public class CustomersSteps
     edges {
       node {
         id
-        email
+        defaultEmailAddress {
+          emailAddress
+        }
         firstName
         lastName
-        phone
+        defaultPhoneNumber {
+          phoneNumber
+        }
         tags
       }
     }

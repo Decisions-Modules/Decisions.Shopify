@@ -38,19 +38,25 @@ internal class GraphVariantNode
     public string? Price { get; set; }
     public int? InventoryQuantity { get; set; }
     public GraphInventoryItem? InventoryItem { get; set; }
-    public GraphConnection<GraphInventoryLevelNode>? InventoryLevels { get; set; }
 }
 
 internal class GraphInventoryItem
 {
     public string? Id { get; set; }
+    public GraphConnection<GraphInventoryLevelNode>? InventoryLevels { get; set; }
 }
 
 internal class GraphInventoryLevelNode
 {
-    public int? Available { get; set; }
+    public GraphInventoryQuantity[]? Quantities { get; set; }
     public GraphInventoryItem? Item { get; set; }
     public GraphLocationNode? Location { get; set; }
+}
+
+internal class GraphInventoryQuantity
+{
+    public string? Name { get; set; }
+    public int? Quantity { get; set; }
 }
 
 internal class GraphLocationNode
@@ -86,11 +92,23 @@ internal class GraphCustomerNode
 {
     public string? Id { get; set; }
     public string? Email { get; set; }
+    public GraphCustomerEmailAddress? DefaultEmailAddress { get; set; }
     public string? FirstName { get; set; }
     public string? LastName { get; set; }
     public string? Phone { get; set; }
+    public GraphCustomerPhoneNumber? DefaultPhoneNumber { get; set; }
     [JsonConverter(typeof(StringOrStringArrayConverter))]
     public string[]? Tags { get; set; }
+}
+
+internal class GraphCustomerEmailAddress
+{
+    public string? EmailAddress { get; set; }
+}
+
+internal class GraphCustomerPhoneNumber
+{
+    public string? PhoneNumber { get; set; }
 }
 
 internal sealed class StringOrStringArrayConverter : JsonConverter<string[]?>
