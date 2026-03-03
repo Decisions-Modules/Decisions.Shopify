@@ -93,6 +93,8 @@ public class ShopifyOrder
     [WritableValue]
     public string Id { get; set; } = string.Empty;
     [WritableValue]
+    public string CustomerId { get; set; } = string.Empty;
+    [WritableValue]
     public string Name { get; set; } = string.Empty;
     [WritableValue]
     public string Email { get; set; } = string.Empty;

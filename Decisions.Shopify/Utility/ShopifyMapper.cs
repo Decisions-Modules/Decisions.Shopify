@@ -66,6 +66,7 @@ internal static class ShopifyMapper
         return new ShopifyOrder
         {
             Id = node.Id ?? string.Empty,
+            CustomerId = node.Customer?.Id ?? string.Empty,
             Name = node.Name ?? string.Empty,
             Email = node.Email ?? string.Empty,
             FinancialStatus = node.DisplayFinancialStatus ?? string.Empty,

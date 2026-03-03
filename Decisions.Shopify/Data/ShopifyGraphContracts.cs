@@ -69,12 +69,18 @@ internal class GraphLocationNode
 internal class GraphOrderNode
 {
     public string? Id { get; set; }
+    public GraphOrderCustomerNode? Customer { get; set; }
     public string? Name { get; set; }
     public string? Email { get; set; }
     public string? DisplayFinancialStatus { get; set; }
     public string? DisplayFulfillmentStatus { get; set; }
     public DateTimeOffset? CreatedAt { get; set; }
     public GraphMoneyBag? TotalPriceSet { get; set; }
+}
+
+internal class GraphOrderCustomerNode
+{
+    public string? Id { get; set; }
 }
 
 internal class GraphMoneyBag
