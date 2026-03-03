@@ -33,16 +33,19 @@ public class InventorySteps
           inventoryQuantity
           inventoryItem {
             id
-          }
-          inventoryLevels(first: 50) {
-            edges {
-              node {
-                available
-                item {
-                  id
-                }
-                location {
-                  id
+            inventoryLevels(first: 50) {
+              edges {
+                node {
+                  quantities(names: [""available""]) {
+                    name
+                    quantity
+                  }
+                  item {
+                    id
+                  }
+                  location {
+                    id
+                  }
                 }
               }
             }
@@ -160,7 +163,10 @@ public class InventorySteps
     inventoryLevels(first: $first) {
       edges {
         node {
-          available
+          quantities(names: [""available""]) {
+            name
+            quantity
+          }
           item {
             id
           }

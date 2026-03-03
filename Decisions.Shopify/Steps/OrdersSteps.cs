@@ -19,6 +19,9 @@ public class OrdersSteps
         const string query = @"query ($id: ID!) {
   order(id: $id) {
     id
+    customer {
+      id
+    }
     name
     email
     displayFinancialStatus
@@ -61,6 +64,9 @@ public class OrdersSteps
     edges {
       node {
         id
+        customer {
+          id
+        }
         name
         email
         displayFinancialStatus

@@ -160,7 +160,7 @@ public class ProductsSteps
 
         Dictionary<string, object?> productInput = new()
         {
-            ["id"] = productId,
+          ["id"] = productId,
           ["title"] = string.IsNullOrWhiteSpace(product.Title) ? null : product.Title,
           ["handle"] = string.IsNullOrWhiteSpace(product.Handle) ? null : product.Handle,
           ["status"] = string.IsNullOrWhiteSpace(product.Status) ? null : product.Status,
