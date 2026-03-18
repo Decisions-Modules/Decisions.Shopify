@@ -6,7 +6,6 @@
     ],
     "ReferenceDlls": [
       "./Decisions.Shopify/obj/ShopifySharp.dll",
-      "./Decisions.Shopify/obj/JetBrains.Annotations.dll",
       "./Decisions.Shopify/obj/Microsoft.Extensions.Http.dll"
     ],
     "CliDlls": null,

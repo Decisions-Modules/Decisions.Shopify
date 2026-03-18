@@ -1,5 +1,5 @@
 using ShopifySharp;
-using ShopifySharp.Services.Graph;
+using System.Text.Json.Serialization;
 
 namespace Decisions.Shopify.Clients;
 
@@ -22,11 +22,22 @@ public class ShopifyGraphQlClient
 
         GraphRequest request = new()
         {
-            Query = query,
-            Variables = variables ?? new Dictionary<string, object>()
+            query = query,
+            variables = variables ?? new Dictionary<string, object>()
         };
 
-        GraphResult<T> response = await graphService.PostAsync<T>(request);
+        GraphQlResponse<T>? response = await graphService.SendAsync<GraphQlResponse<T>>(request, null, CancellationToken.None);
+        if (response is null)
+        {
+            return default;
+        }
+
         return response.Data;
+    }
+
+    private sealed class GraphQlResponse<TData>
+    {
+        [JsonPropertyName("data")]
+        public TData? Data { get; set; }
     }
 }
