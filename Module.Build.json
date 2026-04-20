@@ -1,4 +1,4 @@
-{
+﻿{
   "Resources": {
     "NoComponents": true,
     "CoreServicesDlls": [
@@ -17,7 +17,7 @@
     "ObjectsToImport": null,
     "MsSqlScript": null
   },
-  "Version": "9.0.0",
+  "Version": "10.0.0",
   "ImagePath": "./image.png",
   "Description": "Shopify integration module for products, inventory, orders, and customers."
 }
